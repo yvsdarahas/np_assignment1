@@ -37,14 +37,27 @@ int main(int argc, char *argv[]){
     printf("Host %s, and port %d.\n",Desthost,port);
   #endif
 
+  //Getting the address info(Ipv4/Ipv6/Dns)
+  //Useful when dns host is used
+  struct addrinfo hints, *res;
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+
+  int addr_info = getaddrinfo(Desthost, Destport, &hints, &res);
+  if (addr_info != 0){
+    printf("\n Error in getting Server's info \n");
+    exit(1);
+  }
+
 	//Initialising Socket
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0){
-	  printf("Error creating socket");
+	  printf("\n Error creating socket \n");
 	  exit(1);
 	}
 
-	struct sockaddr_in server_addr;
+  struct sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
 	server_addr.sin_addr.s_addr = inet_addr(Desthost);
