@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
   }
 
 	//Initialising Socket
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sockfd < 0){
 	  printf("\n Error creating socket \n");
 	  exit(1);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 	//Connection to the server is established here
 	int connection = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
 	if (connection < 0){
-	  printf("\n Error in connection \n");
+	  perror("\n Error in connection");
 	  exit(1);
 	}
 
