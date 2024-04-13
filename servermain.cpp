@@ -2,10 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/types.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <math.h>
+#include <netdb.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
@@ -32,7 +33,6 @@ void checkJobbList(int signum)
 
 int main(int argc, char *argv[])
 {
-
     /*
     Read first input, assumes <ip>:<port> syntax, convert into one string (Desthost) and one integer (port).
     Atm, works only on dotted notation, i.e. IPv4 and DNS. IPv6 does not work if its using ':'.
@@ -49,8 +49,21 @@ int main(int argc, char *argv[])
         printf("Host %s, and port %d.\n", Desthost, port);
     #endif
 
+    //Getting the address info(Ipv4/Ipv6/Dns)
+    //Useful when dns host is used
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    int addr_info = getaddrinfo(Desthost, Destport, &hints, &res);
+    if (addr_info != 0){
+        printf("\n Error in getting client's info \n");
+        exit(1);
+    }
+
     // Initialise socket
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (sockfd < 0)
     {
         printf("\n Error creating socket \n");
@@ -231,7 +244,7 @@ int main(int argc, char *argv[])
         alarm(0);
         close(client_sock);
         sleep(1);
-      }
+    }
 
-      close(sockfd);
+    close(sockfd);
 }
